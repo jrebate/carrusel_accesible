@@ -197,7 +197,7 @@
     <h2 id="proTitulo" class="cz-display-md">Carrusel legible Pro</h2>
     <p class="pro-ask">¿Pagarías una cantidad simbólica por estas mejoras?</p>
     <ul>
-      <li>Quitar la marca «Hecho con Carrusel legible» de tus diapositivas.</li>
+      <li>Quitar la marca «Hecho con CentaurUX: Carrusel Legible» de tus diapositivas.</li>
       <li>Plantillas con tu marca: tus colores, tu tipografía y tu logo, con aviso si el contraste se queda corto.</li>
       <li>Guardar tus estilos para que todos tus carruseles salgan iguales.</li>
     </ul>
@@ -520,7 +520,7 @@
     var last = idx === total - 1;
     if (slide.kind !== "final") {
       ctx.font = "500 22px " + F_MONO; ctx.fillStyle = t.muted;
-      ctx.fillText("Hecho con Carrusel legible", P, H - P);
+      ctx.fillText("Hecho con CentaurUX: Carrusel Legible", P, H - P);
     }
     if (!last) {
       ctx.font = "600 30px " + F_SANS; ctx.fillStyle = t.fg; ctx.textAlign = "right";
@@ -558,9 +558,9 @@
       // Marca de agua grande
       var by = H - P - 120;
       ctx.fillStyle = t.accent; ctx.fillRect(P, by - 4, 18, 18);
-      ctx.font = "600 34px " + F_SANS; ctx.fillStyle = t.fg; ctx.fillText("Hecho con Carrusel legible", P + 36, by + 12);
+      ctx.font = "600 34px " + F_SANS; ctx.fillStyle = t.fg; ctx.fillText("Hecho con CentaurUX: Carrusel Legible", P + 36, by + 12);
       ctx.font = "500 26px " + F_MONO; ctx.fillStyle = t.muted; ctx.fillText(SITE + " · gratis", P + 36, by + 56);
-      ops && ops.push({ t: "Hecho con Carrusel legible · " + SITE, x: P, y: by + 12, size: 26 });
+      ops && ops.push({ t: "Hecho con CentaurUX: Carrusel Legible · " + SITE, x: P, y: by + 12, size: 26 });
       return;
     }
 

@@ -12,7 +12,7 @@ Web: https://jrebate.github.io/carrusel_accesible/
 - Pasa las letras «de fantasía» (negritas Unicode copiadas de generadores) a texto normal y las dibuja en negrita de verdad.
 - Deja fuera las líneas de hashtags y avisa de enlaces y diapositivas con demasiadas palabras.
 - El PDF lleva el texto invisible bajo cada imagen, para que se pueda buscar y copiar.
-- Diapositiva final con cierre, firma y la marca «Hecho con Carrusel legible».
+- Diapositiva final con cierre, firma y la marca «Hecho con CentaurUX: Carrusel Legible».
 
 ## Medición
 
