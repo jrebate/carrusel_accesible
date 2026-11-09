@@ -24,4 +24,8 @@ HTML estático sin compilación. Usa [jsPDF 2.5.1](https://github.com/parallax/j
 
 Los avisos son orientativos. No está afiliado a LinkedIn.
 
-Creado por Jorge Rebate Serrano · Licencia CC BY 4.0 (el código de jsPDF mantiene su licencia MIT).
+Creado por Jorge Rebate Serrano.
+
+## Licencia
+
+© 2026 Jorge Rebate Serrano. Todos los derechos reservados. Puedes insertar la herramienta publicada en tu web citando la autoría y sin cobrar por ella; no se permite copiar, modificar ni usar el código con fines comerciales. Detalles en [LICENSE.md](LICENSE.md). jsPDF mantiene su licencia MIT.
