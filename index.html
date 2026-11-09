@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carrusel legible</title>
+<meta name="description" content="Pega el texto de tu post de LinkedIn y descarga un carrusel en PDF con letra grande y buen contraste. Gratis, en tu navegador. Una herramienta de CentaurUX.">
+<meta property="og:title" content="Carrusel legible: tu post de LinkedIn en un carrusel que se lee bien">
+<meta property="og:description" content="Pega el texto, elige estilo y descarga el PDF. Letra grande, buen contraste y una idea por diapositiva. Todo en tu navegador.">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/centaurux-iso-negro.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500;600&display=swap">
+<link rel="stylesheet" href="centaurux-base.css">
+<style>
+  main { display: grid; gap: 4rem; padding-block: 3rem 5rem; }
+  .cz-lead { max-width: none; }
+  .hero { display: grid; gap: 1rem; position: relative; }
+  .hero .cz-sticky { justify-self: start; --cz-rotate: -2deg; margin-top: .5rem; }
+
+  .tool { display: grid; gap: 2rem; align-items: start; }
+  @media (min-width: 1000px) { .tool { grid-template-columns: minmax(340px, 420px) 1fr; } }
+  .panel { display: grid; gap: 1.5rem; min-width: 0; }
+  .field { display: grid; gap: .4rem; }
+  .field > label, legend { font-weight: 600; font-size: .95rem; }
+  .hint { font-size: .875rem; color: var(--cz-muted-fg); }
+  textarea, input[type="text"] {
+    width: 100%; font: 400 1rem/1.5 var(--cz-font-sans); color: var(--cz-fg);
+    background: var(--cz-card); border: 1px solid var(--cz-input); border-radius: var(--cz-radius);
+    padding: .65rem .75rem;
+  }
+  textarea { min-height: 18rem; resize: vertical; }
+  textarea:focus-visible, input:focus-visible { outline: 2px solid var(--cz-fg); outline-offset: 1px; }
+  .row { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+  .two { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); }
+  fieldset { border: 0; border-top: 1px solid var(--cz-rule); margin: 0; padding: 1rem 0 0; display: grid; gap: .6rem; min-width: 0; }
+  legend { padding: 0; float: left; width: 100%; margin-bottom: .2rem; }
+  legend + * { clear: both; }
+  .choices { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); }
+  .choice { position: relative; display: flex; gap: .6rem; align-items: center; padding: .55rem .7rem; border: 1px solid var(--cz-rule); border-radius: var(--cz-radius); background: var(--cz-card); cursor: pointer; font-size: .95rem; }
+  .choice:has(input:checked) { border-color: var(--cz-fg); box-shadow: inset 0 0 0 1px var(--cz-fg); }
+  .choice:has(input:focus-visible) { outline: 2px solid var(--cz-fg); outline-offset: 2px; }
+  .choice input { margin: 0; accent-color: var(--cz-fg); }
+  .choice small { display: block; color: var(--cz-muted-fg); font-size: .8rem; }
+  .swatch { width: 28px; height: 34px; flex: none; border-radius: 2px; border: 1px solid var(--cz-border); display: grid; place-items: center; font: 700 .8rem/1 var(--cz-font-display); }
+  .check { display: flex; gap: .6rem; align-items: center; font-size: .95rem; }
+  .check input { width: 1.1rem; height: 1.1rem; accent-color: var(--cz-fg); }
+  .pro-row { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .pro-chip { display: inline-flex; gap: .45rem; align-items: center; font: 500 .85rem/1.2 var(--cz-font-sans); color: var(--cz-fg); background: transparent; border: 1px dashed var(--cz-input); border-radius: 999px; padding: .45rem .8rem; cursor: pointer; }
+  .pro-chip:hover { border-color: var(--cz-fg); }
+  .pro-chip .tag { font: 500 .62rem/1 var(--cz-font-mono); letter-spacing: .12em; text-transform: uppercase; background: var(--cz-fg); color: var(--cz-bg); border-radius: 2px; padding: .2rem .35rem; }
+
+  .preview { display: grid; gap: 1rem; min-width: 0; }
+  .preview-head { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: center; justify-content: space-between; }
+  .actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .cz-btn--big { padding: .75rem 1.25rem; font-size: .95rem; }
+  .slides { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+  .slide { display: grid; gap: .35rem; margin: 0; }
+  .slide canvas { width: 100%; height: auto; display: block; border: 1px solid var(--cz-rule); border-radius: 2px; background: var(--cz-muted); }
+  .slide figcaption { font: 500 .7rem/1 var(--cz-font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--cz-muted-fg); }
+  .empty { padding: 3rem 1.5rem; border: 1px dashed var(--cz-input); border-radius: var(--cz-radius); color: var(--cz-muted-fg); }
+  .avisos { display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+  .avisos li { display: grid; grid-template-columns: auto 1fr; gap: .6rem; align-items: baseline; padding: .65rem .8rem; border: 1px solid var(--cz-rule); border-radius: var(--cz-radius); background: var(--cz-card); font-size: .925rem; }
+  .avisos li::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--cz-fg); transform: translateY(-1px); }
+  .avisos li.ok::before { background: var(--cz-violet); border-radius: 999px; }
+  .tip { font-size: .925rem; color: var(--cz-muted-fg); }
+  .status { font-size: .9rem; min-height: 1.4em; }
+
+  .pro { display: grid; gap: 1rem; padding: 1.5rem; border: 1px solid var(--cz-border); background: var(--cz-card); border-radius: var(--cz-radius); }
+  .pro ul { margin: 0; padding-left: 1.2rem; display: grid; gap: .35rem; }
+  .pro-ask { font-weight: 600; font-size: 1.05rem; }
+  .pro-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .thanks { padding: .75rem 1rem; background: var(--cz-muted); border-radius: var(--cz-radius); }
+  .pro-contact { display: flex; flex-wrap: wrap; gap: .25rem .75rem; align-items: center; }
+  .notes { display: grid; gap: .75rem; font-size: .925rem; color: var(--cz-muted-fg); border-top: 1px solid var(--cz-rule); padding-top: 1.5rem; }
+  .notes a, .notes strong { color: var(--cz-fg); }
+  .how { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+  .how .cz-card { padding: 1.25rem; display: grid; gap: .5rem; align-content: start; }
+  .how .cz-card:hover { transform: none; box-shadow: none; border-color: var(--cz-rule); }
+  .how .num { font: 500 .75rem/1 var(--cz-font-mono); letter-spacing: .12em; color: var(--cz-muted-fg); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<header class="cz-header cz-dark">
+  <div class="cz-wrap cz-header__inner">
+    <a class="cz-wordmark" href="https://centaurux.es" target="_blank" rel="noopener" aria-label="CentaurUX, ir a la web" data-track="carrusel-ir-centaurux">
+      <img src="assets/centaurux-iso-blanco.png" alt="" width="28" height="28">
+      <span>CentaurUX</span>
+    </a>
+    <span class="cz-header__tag">Research, redesigned.</span>
+  </div>
+</header>
+
+<main class="cz-wrap">
+  <section class="hero">
+    <span class="cz-label">CentaurUX · Lab · Carrusel legible</span>
+    <h1 class="cz-display-xl">Tu post de LinkedIn, en un carrusel que <span class="cz-marker">se lee</span> en el móvil</h1>
+    <p class="cz-lead">Pega el texto, elige un estilo y descarga el PDF. Letra grande, buen contraste y una idea por diapositiva. Todo pasa en tu navegador: tu texto no se envía a ningún sitio.</p>
+    <p class="cz-sticky">Sin registro y sin plantillas grises</p>
+  </section>
+
+  <section class="tool" aria-label="Crear el carrusel">
+    <form class="panel" id="form" onsubmit="return false">
+      <div class="field">
+        <label for="texto">Texto del post</label>
+        <textarea id="texto" spellcheck="true" aria-describedby="textoAyuda" placeholder="Pega aquí el texto de tu publicación…"></textarea>
+        <p class="hint" id="textoAyuda">La primera idea será la portada. Separa las ideas con una línea en blanco y escribe <code>---</code> en una línea para forzar una diapositiva nueva. Para negrita, usa **así**.</p>
+        <div class="row">
+          <button type="button" class="cz-btn cz-btn--outline" id="ejemplo">Probar con un ejemplo</button>
+          <span class="hint cz-num" id="cuenta" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <fieldset>
+        <legend>Tu firma</legend>
+        <div class="two">
+          <div class="field"><label for="nombre">Nombre</label><input type="text" id="nombre" autocomplete="name" placeholder="Ana Pérez"></div>
+          <div class="field"><label for="cargo">Cargo o usuario</label><input type="text" id="cargo" placeholder="UX Researcher"></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Estilo</legend>
+        <div class="choices" id="temas" role="radiogroup" aria-label="Colores"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Tamaño de la letra</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="tam" value="46"><span>Grande<small>46 px</small></span></label>
+          <label class="choice"><input type="radio" name="tam" value="54" checked><span>Más grande<small>54 px</small></span></label>
+          <label class="choice"><input type="radio" name="tam" value="62"><span>Enorme<small>62 px</small></span></label>
+        </div>
+        <p class="hint">Medido sobre una diapositiva de 1080 px de ancho. Por debajo de unos 40 px cuesta leer en el móvil.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Formato y reparto</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="fmt" value="1350" checked><span>Vertical 4:5<small>1080 × 1350</small></span></label>
+          <label class="choice"><input type="radio" name="fmt" value="1080"><span>Cuadrado<small>1080 × 1080</small></span></label>
+        </div>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="modo" value="idea" checked><span>Una idea por diapositiva<small>Cada párrafo, en la suya</small></span></label>
+          <label class="choice"><input type="radio" name="modo" value="compacto"><span>Compacto<small>Junta párrafos si caben</small></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Diapositiva final</legend>
+        <label class="check"><input type="checkbox" id="final" checked> Añadir una diapositiva de cierre</label>
+        <div class="field">
+          <label for="cierre">Texto del cierre</label>
+          <input type="text" id="cierre" value="¿Te ha servido? Guárdalo y compártelo con quien lo necesite.">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Pro</legend>
+        <div class="pro-row">
+          <button type="button" class="pro-chip" data-pro="carrusel-pro-quitar-marca"><span class="tag">Pro</span> Quitar «Hecho con»</button>
+          <button type="button" class="pro-chip" data-pro="carrusel-pro-marca-propia"><span class="tag">Pro</span> Tus colores y logo</button>
+          <button type="button" class="pro-chip" data-pro="carrusel-pro-guardar-estilo"><span class="tag">Pro</span> Guardar este estilo</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <section class="preview" aria-labelledby="vistaTitulo">
+      <div class="preview-head">
+        <h2 class="cz-section-title" id="vistaTitulo"><span>Vista previa</span> <span id="nDiapos"></span></h2>
+        <div class="actions">
+          <button type="button" class="cz-btn cz-btn--big" id="descargar" disabled>Descargar PDF <span class="cz-arrow" aria-hidden="true">↓</span></button>
+          <button type="button" class="cz-btn cz-btn--outline cz-btn--big" id="copiar" disabled>Copiar texto para la publicación</button>
+        </div>
+      </div>
+      <p class="status" id="estado" role="status" aria-live="polite"></p>
+      <ul class="avisos" id="avisos" aria-label="Avisos sobre tu carrusel"></ul>
+      <div class="slides" id="slides"></div>
+      <p class="empty" id="vacio">Pega el texto de tu post o prueba con el ejemplo para ver aquí las diapositivas.</p>
+      <p class="tip">LinkedIn no deja poner texto alternativo a un documento. Pega también el texto completo en la publicación: así llega a quien usa lector de pantalla y a quien no abre el carrusel. El PDF lleva el texto por debajo de cada diapositiva, para que se pueda buscar y copiar.</p>
+    </section>
+  </section>
+
+  <section style="display:grid;gap:1.25rem" aria-labelledby="comoTitulo">
+    <h2 class="cz-section-title" id="comoTitulo">Por qué se lee mejor</h2>
+    <div class="how">
+      <article class="cz-card"><span class="num">01</span><h3 class="cz-display-md">Letra grande de verdad</h3><p>El tamaño mínimo es fijo y el texto no se encoge para caber: si no cabe, pasa a la siguiente diapositiva.</p></article>
+      <article class="cz-card"><span class="num">02</span><h3 class="cz-display-md">Contraste alto</h3><p>Los cuatro estilos tienen un contraste de texto de 10:1 o más. Te enseñamos la cifra de cada uno.</p></article>
+      <article class="cz-card"><span class="num">03</span><h3 class="cz-display-md">Sin letras de fantasía</h3><p>Las negritas copiadas de generadores (𝗮𝘀𝗶́) se pasan a texto normal y salen en negrita de verdad.</p></article>
+    </div>
+  </section>
+
+  <section class="pro" id="pro" aria-labelledby="proTitulo" tabindex="-1">
+    <h2 id="proTitulo" class="cz-display-md">Carrusel legible Pro</h2>
+    <p class="pro-ask">¿Pagarías una cantidad simbólica por estas mejoras?</p>
+    <ul>
+      <li>Quitar la marca «Hecho con Carrusel legible» de tus diapositivas.</li>
+      <li>Plantillas con tu marca: tus colores, tu tipografía y tu logo, con aviso si el contraste se queda corto.</li>
+      <li>Guardar tus estilos para que todos tus carruseles salgan iguales.</li>
+    </ul>
+    <div class="pro-actions">
+      <button type="button" class="cz-btn" id="proBtn">Me interesa <span class="cz-arrow" aria-hidden="true">→</span></button>
+      <a class="cz-btn cz-btn--outline" href="https://ko-fi.com/jrebate" target="_blank" rel="noopener" data-track="carrusel-kofi-pro">Apóyalo ya en Ko-fi</a>
+    </div>
+    <div class="thanks" id="proGracias" hidden role="status">Gracias, lo tendremos en cuenta. Tu interés nos ayuda a decidir qué construir. Mientras tanto, el carrusel es gratis.</div>
+    <p class="pro-contact">¿Te interesa mucho o echas algo en falta? Escríbeme, soy Jorge: <span class="cz-creditos__addr">jrebateserrano@gmail.com</span> <button type="button" class="cz-creditos__copy" data-cz-copy="jrebateserrano@gmail.com" data-track="carrusel-contacto-email">Copiar correo</button></p>
+  </section>
+
+  <section class="notes" aria-label="Notas">
+    <p>Los avisos son orientativos. Letra grande y buen contraste ayudan a leer, pero no garantizan que un contenido sea accesible para todo el mundo. Carrusel legible no está afiliado a LinkedIn.</p>
+    <p>¿Quieres que el texto de tu post se entienda mejor? Prueba <a href="https://jrebate.github.io/lenguaje_claro/" target="_blank" rel="noopener" data-track="carrusel-ir-legible">Legible</a>, el asistente de lenguaje claro. ¿Te resulta útil? Puedes <a href="https://ko-fi.com/jrebate" target="_blank" rel="noopener" data-track="carrusel-kofi-pie">invitarnos a un café en Ko-fi</a>.</p>
+    <p><strong>Privacidad:</strong> tu texto no sale de tu navegador. Solo guardamos un borrador en este navegador para que no lo pierdas al recargar. Contamos visitas y clics con <a href="https://www.goatcounter.com/" target="_blank" rel="noopener">GoatCounter</a>, que no usa cookies ni guarda datos personales.</p>
+  </section>
+</main>
+
+<footer class="cz-footer">
+  <div class="cz-wrap cz-footer__inner">
+    <span class="cz-label">Human + AI = Centaur</span>
+    <a class="cz-wordmark" href="https://centaurux.es" target="_blank" rel="noopener">
+      <img class="cz-logo--light-bg" src="assets/centaurux-iso-negro.png" alt="" width="24" height="24">
+      <img class="cz-logo--dark-bg" src="assets/centaurux-iso-blanco.png" alt="" width="24" height="24">
+      <span class="cz-label" style="color:var(--cz-fg)">CentaurUX</span>
+    </a>
+    <div class="cz-footer__creditos">
+    <div class="cz-creditos">
+      <p class="cz-creditos__cta"><img class="cz-logo--light-bg" src="assets/centaurux-iso-negro.png" alt="" width="22" height="22"><img class="cz-logo--dark-bg" src="assets/centaurux-iso-blanco.png" alt="" width="22" height="22"><span>Ponte al día con la IA en UX, a tu ritmo y sin FOMO, en <a href="https://www.shiftr.pro/" target="_blank" rel="noopener">Shift+R</a> y <a href="https://centaurux.es" target="_blank" rel="noopener">CentaurUX</a></span></p>
+      <p>Creado por <b>Jorge Rebate Serrano</b> · Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>: puedes usarlo y adaptarlo citando la autoría.</p>
+      <p class="cz-creditos__mail">Correo: <span class="cz-creditos__addr">jrebateserrano@gmail.com</span> <button type="button" class="cz-creditos__copy" data-cz-copy="jrebateserrano@gmail.com">Copiar correo</button></p>
+      <p>LinkedIn: <a href="https://www.linkedin.com/in/jrebateserrano/" target="_blank" rel="noopener">Jorge Rebate Serrano</a></p>
+    </div>
+    </div>
+  </div>
+</footer>
+
+<script src="vendor/jspdf.umd.min.js" defer></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Medición (GoatCounter) ---------- */
+  function track(name, title) {
+    try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: title || name, event: true }); } catch (e) {}
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("[data-track]");
+    if (a) track(a.getAttribute("data-track"));
+  });
+
+  /* ---------- Copiar correo ---------- */
+  document.querySelectorAll("[data-cz-copy]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var t = b.getAttribute("data-cz-copy"), label = b.textContent;
+      function ok() { b.textContent = "Copiado"; setTimeout(function () { b.textContent = label; }, 1800); }
+      function sel() { var r = document.createRange(); r.selectNodeContents(b.previousElementSibling); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Seleccionado"; }
+      try { navigator.clipboard.writeText(t).then(ok, sel); } catch (e) { sel(); }
+    });
+  });
+
+  /* ---------- Constantes ---------- */
+  var SITE = "jrebate.github.io/carrusel_accesible";
+  var W = 1080, P = 88;
+  var THEMES = {
+    crema:  { name: "Crema",  bg: "#f1eee4", fg: "#121417", muted: "#4f535a", accent: "#d9ec39" },
+    carbon: { name: "Carbón", bg: "#121417", fg: "#f4f2ea", muted: "#b4b8bf", accent: "#d9ec39" },
+    lima:   { name: "Lima",   bg: "#d9ec39", fg: "#121417", muted: "#2f3338", accent: "#121417" },
+    blanco: { name: "Blanco", bg: "#ffffff", fg: "#111111", muted: "#4a4a4a", accent: "#6449da" }
+  };
+  var F_DISPLAY = '"Archivo", "Helvetica Neue", Arial, sans-serif';
+  var F_SANS = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
+  var F_MONO = '"IBM Plex Mono", ui-monospace, monospace';
+
+  function lum(hex) {
+    var n = parseInt(hex.slice(1), 16), c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(function (v) { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  function ratio(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function fmtRatio(r) { return (Math.floor(r * 10) / 10).toFixed(1).replace(".", ",") + ":1"; }
+
+  /* ---------- Elementos ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+  var elTexto = $("texto"), elNombre = $("nombre"), elCargo = $("cargo"), elFinal = $("final"), elCierre = $("cierre");
+  var elSlides = $("slides"), elVacio = $("vacio"), elAvisos = $("avisos"), elN = $("nDiapos"), elEstado = $("estado");
+  var btnPdf = $("descargar"), btnCopiar = $("copiar");
+
+  var temas = $("temas");
+  Object.keys(THEMES).forEach(function (k, i) {
+    var t = THEMES[k];
+    var l = document.createElement("label");
+    l.className = "choice";
+    l.innerHTML = '<input type="radio" name="tema" value="' + k + '"' + (i === 0 ? " checked" : "") + '>' +
+      '<span class="swatch" aria-hidden="true" style="background:' + t.bg + ';color:' + t.fg + '">Aa</span>' +
+      '<span>' + t.name + '<small>Contraste ' + fmtRatio(ratio(t.fg, t.bg)) + '</small></span>';
+    temas.appendChild(l);
+  });
+
+  function radio(name) { var r = document.querySelector('input[name="' + name + '"]:checked'); return r ? r.value : null; }
+  function opts() {
+    return {
+      theme: radio("tema") || "crema", S: +radio("tam") || 54, H: +radio("fmt") || 1350, mode: radio("modo") || "idea",
+      name: elNombre.value.trim(), handle: elCargo.value.trim(), final: elFinal.checked, cierre: elCierre.value.trim()
+    };
+  }
+
+  /* ---------- Texto: letras de fantasía y negritas ---------- */
+  function isBoldMath(cp) {
+    return (cp >= 0x1D400 && cp <= 0x1D433) || (cp >= 0x1D468 && cp <= 0x1D49B) || (cp >= 0x1D4D0 && cp <= 0x1D503) ||
+      (cp >= 0x1D56C && cp <= 0x1D59F) || (cp >= 0x1D5D4 && cp <= 0x1D607) || (cp >= 0x1D63C && cp <= 0x1D66F) ||
+      (cp >= 0x1D7CE && cp <= 0x1D7D7) || (cp >= 0x1D7EC && cp <= 0x1D7F5);
+  }
+  function cleanFancy(text) {
+    var out = "", bold = false, n = 0;
+    for (var ch of text) {
+      var cp = ch.codePointAt(0);
+      if (cp >= 0x1D400 && cp <= 0x1D7FF) {
+        var b = isBoldMath(cp);
+        if (b !== bold) { out += "**"; bold = b; }
+        out += ch.normalize("NFKC"); n++;
+      } else {
+        if (bold && /[A-Za-z0-9\n#@]/.test(ch)) { out += "**"; bold = false; }
+        out += ch;
+      }
+    }
+    if (bold) out += "**";
+    return { text: out, n: n };
+  }
+  function plain(text) { return cleanFancy(text).text.replace(/\*\*/g, ""); }
+
+  function toWords(str) {
+    var words = [], cur = [], bold = false;
+    str.split("**").forEach(function (seg, i) {
+      if (i > 0) bold = !bold;
+      seg.split(/(\s+)/).forEach(function (part) {
+        if (!part) return;
+        if (/^\s+$/.test(part)) { if (cur.length) { words.push(cur); cur = []; } }
+        else cur.push({ t: part, b: bold });
+      });
+    });
+    if (cur.length) words.push(cur);
+    return words;
+  }
+  function wordsText(words) { return words.map(function (w) { return w.map(function (s) { return s.t; }).join(""); }).join(" "); }
+  function countWords(words) { return words.filter(function (w) { return /[\p{L}\p{N}]/u.test(w.map(function (s) { return s.t; }).join("")); }).length; }
+
+  var HASHTAGS = /^(?:[#＃][\p{L}\p{N}_]+[\s,.]*)+$/u;
+  var LISTA = /^([-–—•·▪◦*]|\d{1,2}[.)])\s+(.+)$/;
+
+  function parse(raw) {
+    var c = cleanFancy(raw.replace(/\r/g, ""));
+    var paras = [], cur = null, hashtags = 0;
+    c.text.split("\n").forEach(function (line) {
+      var t = line.trim();
+      if (t === "---") { if (cur) paras.push(cur); paras.push({ brk: true }); cur = null; return; }
+      if (!t || t === "**" || t === "****") { if (cur) paras.push(cur); cur = null; return; }
+      if (HASHTAGS.test(t.replace(/\*\*/g, ""))) { hashtags++; return; }
+      if (!cur) cur = { blocks: [] };
+      var m = t.match(LISTA);
+      if (m && !/^\*\*/.test(t)) cur.blocks.push({ type: "li", marker: /\d/.test(m[1]) ? m[1].replace(")", ".") : null, words: toWords(m[2]) });
+      else cur.blocks.push({ type: "p", words: toWords(t) });
+    });
+    if (cur) paras.push(cur);
+    return { paras: paras, fancy: c.n, hashtags: hashtags, urls: (c.text.match(/https?:\/\/\S+|www\.\S+/g) || []).length };
+  }
+
+  /* ---------- Medida y reparto ---------- */
+  var mctx = document.createElement("canvas").getContext("2d");
+  function setFont(ctx, kind, S, bold) {
+    if (kind === "display") { ctx.font = "800 " + S + "px " + F_DISPLAY; try { ctx.fontStretch = "semi-condensed"; } catch (e) {} }
+    else { ctx.font = (bold ? "600 " : "400 ") + S + "px " + F_SANS; try { ctx.fontStretch = "normal"; } catch (e) {} }
+  }
+  function wordWidth(w, S, kind) { var s = 0; w.forEach(function (seg) { setFont(mctx, kind, S, seg.b); s += mctx.measureText(seg.t).width; }); return s; }
+  function breakWord(w, maxW, S, kind) {
+    var pieces = [], cur = [], cw = 0;
+    w.forEach(function (seg) {
+      for (var ch of seg.t) {
+        setFont(mctx, kind, S, seg.b); var chw = mctx.measureText(ch).width;
+        if (cw + chw > maxW && cur.length) { pieces.push(cur); cur = []; cw = 0; }
+        var last = cur[cur.length - 1];
+        if (last && last.b === seg.b) last.t += ch; else cur.push({ t: ch, b: seg.b });
+        cw += chw;
+      }
+    });
+    if (cur.length) pieces.push(cur);
+    return pieces;
+  }
+  function wrap(words, maxW, S, kind) {
+    setFont(mctx, kind, S, false);
+    var sp = mctx.measureText(" ").width, lines = [], line = [], lw = 0;
+    function add(w, ww) {
+      if (line.length && lw + sp + ww > maxW) { lines.push({ words: line, w: lw }); line = [w]; lw = ww; }
+      else { lw += (line.length ? sp : 0) + ww; line.push(w); }
+    }
+    words.forEach(function (w) {
+      var ww = wordWidth(w, S, kind);
+      if (ww > maxW) breakWord(w, maxW, S, kind).forEach(function (p) { add(p, wordWidth(p, S, kind)); });
+      else add(w, ww);
+    });
+    if (line.length) lines.push({ words: line, w: lw });
+    return lines;
+  }
+
+  function geom(o) {
+    var top = P + (o.name || o.handle ? 132 : 72), bottom = o.H - P - 76;
+    return { top: top, bottom: bottom, avail: bottom - top, w: W - 2 * P, lh: Math.round(o.S * 1.32), gapLine: Math.round(o.S * 0.42), gapPara: Math.round(o.S * 0.95), indent: Math.round(o.S * 1.3) };
+  }
+
+  function build(raw, o) {
+    var parsed = parse(raw), g = geom(o), paras = parsed.paras.slice();
+    while (paras.length && paras[0].brk) paras.shift();
+    if (!paras.length) return null;
+
+    // Portada
+    var first = paras.shift(), titleWords = [];
+    first.blocks.forEach(function (b) { titleWords = titleWords.concat(b.words); });
+    if (countWords(titleWords) > 26) {
+      var cut = titleWords.findIndex(function (w, i) { return i >= 3 && /[.!?…:]["»”)]*$/.test(w.map(function (s) { return s.t; }).join("")); });
+      if (cut < 0 || cut > 30) cut = 18;
+      var rest = titleWords.slice(cut + 1);
+      titleWords = titleWords.slice(0, cut + 1);
+      if (rest.length) paras.unshift({ blocks: [{ type: "p", words: rest }] });
+    }
+    var cover = { kind: "cover", words: titleWords };
+    var ts = 128, tl;
+    for (; ts >= 60; ts -= 4) { tl = wrap(titleWords, g.w, ts, "display"); if (tl.length * ts * 1.02 <= g.avail * 0.78) break; }
+    cover.size = ts; cover.lines = tl;
+
+    // Contenido
+    var slides = [], cur = null, used = 0;
+    function newSlide() { cur = { kind: "body", items: [] }; slides.push(cur); used = 0; }
+    function measure(b) { return wrap(b.words, g.w - (b.type === "li" ? g.indent : 0), o.S, "body"); }
+    function paraH(p) { var h = 0; p.blocks.forEach(function (b, i) { h += (i ? g.gapLine : 0) + measure(b).length * g.lh; }); return h; }
+
+    paras.forEach(function (para) {
+      if (para.brk) { cur = null; return; }
+      if (!cur) newSlide();
+      else if (cur.items.length && o.mode === "idea") newSlide();
+      else if (cur.items.length && used + g.gapPara + paraH(para) > g.avail) newSlide();
+      para.blocks.forEach(function (b, bi) {
+        var queue = [b];
+        while (queue.length) {
+          var blk = queue.shift(), lines = measure(blk);
+          var gap = cur.items.length ? (bi === 0 && !blk.cont ? g.gapPara : g.gapLine) : 0;
+          var h = lines.length * g.lh;
+          if (used + gap + h <= g.avail) { cur.items.push({ blk: blk, lines: lines, gap: gap }); used += gap + h; continue; }
+          if (cur.items.length) { newSlide(); queue.unshift(blk); continue; }
+          // Bloque más largo que una diapositiva: se parte, mejor al final de una frase
+          var maxLines = Math.max(1, Math.floor(g.avail / g.lh)), k = 0;
+          for (var i = 0; i < maxLines; i++) k += lines[i].words.length;
+          var flat = [];
+          lines.forEach(function (l) { flat = flat.concat(l.words); });
+          var best = k;
+          for (var j = k; j >= Math.ceil(k * 0.5); j--) {
+            if (/[.!?…:;]["»”)]*$/.test(flat[j - 1].map(function (s) { return s.t; }).join(""))) { best = j; break; }
+          }
+          var a = { type: blk.type, marker: blk.marker, cont: blk.cont, words: flat.slice(0, best) };
+          var r = { type: blk.type, marker: null, cont: true, words: flat.slice(best) };
+          var la = measure(a);
+          cur.items.push({ blk: a, lines: la, gap: 0 }); used = la.length * g.lh;
+          if (r.words.length) { newSlide(); queue.unshift(r); }
+        }
+      });
+    });
+    slides = slides.filter(function (s) { return s.items.length; });
+
+    // Frases cortas: más grandes
+    slides.forEach(function (s) {
+      if (s.items.length !== 1) return;
+      var b = s.items[0].blk;
+      if (b.type !== "p" || b.cont || countWords(b.words) > 14 || /https?:|www\./i.test(wordsText(b.words))) return;
+      for (var z = 104; z > o.S + 6; z -= 4) {
+        var l = wrap(b.words, g.w, z, "display");
+        if (l.length * z * 1.08 <= g.avail) { s.kind = "statement"; s.size = z; s.lines = l; break; }
+      }
+    });
+
+    var all = [cover].concat(slides);
+    if (o.final) all.push({ kind: "final" });
+
+    // Avisos
+    var avisos = [];
+    if (parsed.fancy) avisos.push("He pasado a texto normal " + parsed.fancy + " caracteres «de fantasía» (negritas y cursivas copiadas de generadores). Muchos lectores de pantalla no los leen bien. En el carrusel salen en negrita de verdad, y te conviene cambiarlos también en la publicación: el botón «Copiar texto» ya los da limpios.");
+    if (parsed.hashtags) avisos.push("He dejado fuera " + parsed.hashtags + (parsed.hashtags === 1 ? " línea" : " líneas") + " de hashtags. Funcionan mejor en el texto de la publicación.");
+    if (parsed.urls) avisos.push("Tu texto tiene enlaces. En un carrusel de LinkedIn no se pueden pulsar: ponlos en la publicación o en el primer comentario.");
+    slides.forEach(function (s, i) {
+      var n = 0; s.items.forEach(function (it) { n += countWords(it.blk.words); });
+      if (n > 50) avisos.push("La diapositiva " + (i + 2) + " tiene " + n + " palabras. Con menos de 40 se lee de un vistazo; prueba a partirla con una línea en blanco.");
+    });
+    if (all.length > 12) avisos.push("Te salen " + all.length + " diapositivas. A partir de 10 o 12 mucha gente deja de deslizar. Prueba el modo compacto o recorta el texto.");
+    if (!avisos.length) avisos.push({ ok: true, t: "Todo en orden: letra de " + o.S + " px y contraste de " + fmtRatio(ratio(THEMES[o.theme].fg, THEMES[o.theme].bg)) + " en todas las diapositivas." });
+
+    return { slides: all, avisos: avisos, g: g, title: wordsText(titleWords) };
+  }
+
+  /* ---------- Dibujo ---------- */
+  function drawWords(ctx, line, x, y, S, kind, color, ops) {
+    setFont(ctx, kind, S, false);
+    var sp = ctx.measureText(" ").width, cx = x;
+    ctx.fillStyle = color;
+    line.words.forEach(function (w, i) {
+      if (i) cx += sp;
+      w.forEach(function (seg) { setFont(ctx, kind, S, seg.b); ctx.fillText(seg.t, cx, y); cx += ctx.measureText(seg.t).width; });
+    });
+    if (ops) ops.push({ t: wordsText(line.words), x: x, y: y, size: S });
+  }
+
+  function drawSlide(ctx, slide, idx, total, o, g, ops) {
+    var t = THEMES[o.theme], H = o.H;
+    ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
+    ctx.fillStyle = t.bg; ctx.fillRect(0, 0, W, H);
+
+    // Cabecera: firma y número
+    if (o.name) { ctx.font = "600 32px " + F_SANS; ctx.fillStyle = t.fg; ctx.fillText(o.name, P, P + 30); }
+    if (o.handle) { ctx.font = "400 28px " + F_SANS; ctx.fillStyle = t.muted; ctx.fillText(o.handle, P, P + (o.name ? 70 : 30)); }
+    ctx.font = "500 26px " + F_MONO; ctx.fillStyle = t.muted; ctx.textAlign = "right";
+    ctx.fillText((idx + 1) + "/" + total, W - P, P + 30); ctx.textAlign = "left";
+
+    // Pie: marca de agua y "Desliza"
+    var last = idx === total - 1;
+    if (slide.kind !== "final") {
+      ctx.font = "500 22px " + F_MONO; ctx.fillStyle = t.muted;
+      ctx.fillText("Hecho con Carrusel legible", P, H - P);
+    }
+    if (!last) {
+      ctx.font = "600 30px " + F_SANS; ctx.fillStyle = t.fg; ctx.textAlign = "right";
+      ctx.fillText("Desliza →", W - P, H - P); ctx.textAlign = "left";
+    }
+
+    if (slide.kind === "cover") {
+      ctx.fillStyle = t.accent; ctx.fillRect(P, g.top, 132, 18);
+      var y = g.top + 60, lhT = Math.round(slide.size * 1.02);
+      slide.lines.forEach(function (l, i) {
+        try { ctx.fontStretch = "semi-condensed"; } catch (e) {}
+        drawWords(ctx, l, P, y + Math.round(slide.size * 0.82) + i * lhT, slide.size, "display", t.fg, ops);
+      });
+      try { ctx.fontStretch = "normal"; } catch (e) {}
+      return;
+    }
+
+    if (slide.kind === "statement") {
+      var lh = Math.round(slide.size * 1.08), hh = slide.lines.length * lh;
+      var y0 = g.top + Math.max(0, (g.avail - hh) * 0.42);
+      slide.lines.forEach(function (l, i) { drawWords(ctx, l, P, y0 + Math.round(slide.size * 0.84) + i * lh, slide.size, "display", t.fg, ops); });
+      try { ctx.fontStretch = "normal"; } catch (e) {}
+      return;
+    }
+
+    if (slide.kind === "final") {
+      var fy = g.top + 20, cw = toWords(o.cierre || "Gracias por leer.");
+      var cs = 84, cl;
+      for (; cs >= 52; cs -= 4) { cl = wrap(cw, g.w, cs, "display"); if (cl.length * cs * 1.08 <= g.avail * 0.55) break; }
+      cl.forEach(function (l, i) { drawWords(ctx, l, P, fy + Math.round(cs * 0.84) + i * Math.round(cs * 1.08), cs, "display", t.fg, ops); });
+      try { ctx.fontStretch = "normal"; } catch (e) {}
+      var ny = fy + cl.length * Math.round(cs * 1.08) + 70;
+      if (o.name) { ctx.font = "600 44px " + F_SANS; ctx.fillStyle = t.fg; ctx.fillText(o.name, P, ny); ops && ops.push({ t: o.name, x: P, y: ny, size: 44 }); ny += 52; }
+      if (o.handle) { ctx.font = "400 36px " + F_SANS; ctx.fillStyle = t.muted; ctx.fillText(o.handle, P, ny); ops && ops.push({ t: o.handle, x: P, y: ny, size: 36 }); }
+      // Marca de agua grande
+      var by = H - P - 120;
+      ctx.fillStyle = t.accent; ctx.fillRect(P, by - 4, 18, 18);
+      ctx.font = "600 34px " + F_SANS; ctx.fillStyle = t.fg; ctx.fillText("Hecho con Carrusel legible", P + 36, by + 12);
+      ctx.font = "500 26px " + F_MONO; ctx.fillStyle = t.muted; ctx.fillText(SITE + " · gratis", P + 36, by + 56);
+      ops && ops.push({ t: "Hecho con Carrusel legible · " + SITE, x: P, y: by + 12, size: 26 });
+      return;
+    }
+
+    // Cuerpo
+    var usedH = 0;
+    slide.items.forEach(function (it) { usedH += it.gap + it.lines.length * g.lh; });
+    var yy = g.top + Math.max(0, (g.avail - usedH) * 0.3), base = Math.round(g.lh * 0.76);
+    slide.items.forEach(function (it) {
+      yy += it.gap;
+      var b = it.blk, x = P + (b.type === "li" ? g.indent : 0);
+      if (b.type === "li" && !b.cont) {
+        ctx.fillStyle = t.fg;
+        if (b.marker) { ctx.font = "600 " + o.S + "px " + F_SANS; ctx.fillText(b.marker, P, yy + base); }
+        else { var sq = Math.round(o.S * 0.3); ctx.fillRect(P + 4, yy + base - Math.round(o.S * 0.36) - sq / 2, sq, sq); }
+      }
+      it.lines.forEach(function (l, i) { drawWords(ctx, l, x, yy + base + i * g.lh, o.S, "body", t.fg, ops); });
+      yy += it.lines.length * g.lh;
+    });
+  }
+
+  function slideAlt(slide, o) {
+    if (slide.kind === "final") return [o.cierre, o.name, o.handle].filter(Boolean).join(". ");
+    if (slide.kind === "cover") return wordsText(slide.words);
+    if (slide.kind === "statement") return wordsText(slide.items[0].blk.words);
+    return slide.items.map(function (it) { return wordsText(it.blk.words); }).join(" ");
+  }
+
+  /* ---------- Render de la vista previa ---------- */
+  var model = null, lastOpts = null;
+  function render() {
+    var o = opts(), raw = elTexto.value;
+    lastOpts = o;
+    var nw = raw.trim() ? raw.trim().split(/\s+/).length : 0;
+    $("cuenta").textContent = nw ? nw + (nw === 1 ? " palabra" : " palabras") : "";
+    model = raw.trim() ? build(raw, o) : null;
+    elAvisos.innerHTML = "";
+    if (!model) {
+      elSlides.innerHTML = ""; elVacio.hidden = false; elN.textContent = "";
+      btnPdf.disabled = true; btnCopiar.disabled = true; return;
+    }
+    elVacio.hidden = true; btnPdf.disabled = false; btnCopiar.disabled = false;
+    var total = model.slides.length;
+    elN.textContent = "· " + total + (total === 1 ? " diapositiva" : " diapositivas");
+    model.avisos.forEach(function (a) {
+      var li = document.createElement("li");
+      if (typeof a === "object") { li.className = "ok"; li.textContent = a.t; } else li.textContent = a;
+      elAvisos.appendChild(li);
+    });
+    while (elSlides.children.length > total) elSlides.removeChild(elSlides.lastChild);
+    model.slides.forEach(function (s, i) {
+      var fig = elSlides.children[i];
+      if (!fig) {
+        fig = document.createElement("figure"); fig.className = "slide";
+        fig.innerHTML = '<canvas role="img"></canvas><figcaption></figcaption>';
+        elSlides.appendChild(fig);
+      }
+      var c = fig.firstChild;
+      if (c.width !== W) c.width = W;
+      if (c.height !== o.H) c.height = o.H;
+      drawSlide(c.getContext("2d"), s, i, total, o, model.g, null);
+      c.setAttribute("aria-label", "Diapositiva " + (i + 1) + " de " + total + ": " + slideAlt(s, o));
+      fig.lastChild.textContent = (i + 1) + " / " + total;
+    });
+  }
+  var timer = null;
+  function schedule() { clearTimeout(timer); timer = setTimeout(function () { render(); save(); }, 180); }
+  $("form").addEventListener("input", schedule);
+  $("form").addEventListener("change", schedule);
+
+  /* ---------- Borrador en este navegador ---------- */
+  var KEY = "carrusel-legible-borrador";
+  function save() { try { localStorage.setItem(KEY, JSON.stringify({ t: elTexto.value, n: elNombre.value, c: elCargo.value })); } catch (e) {} }
+  try { var d = JSON.parse(localStorage.getItem(KEY) || "null"); if (d) { elTexto.value = d.t || ""; elNombre.value = d.n || ""; elCargo.value = d.c || ""; } } catch (e) {}
+
+  /* ---------- Ejemplo ---------- */
+  var EJEMPLO = "Tus carruseles se leen en el móvil. Diséñalos para el móvil.\n\n" +
+    "Casi nadie amplía una diapositiva para leerla. Si la letra es pequeña, la gente desliza y se va.\n\n" +
+    "Tres cambios que se notan enseguida:\n" +
+    "- Letra de 40 px o más en una diapositiva de 1080.\n" +
+    "- Tinta oscura sobre fondo claro, o al revés. Nada de gris sobre gris.\n" +
+    "- Una idea por diapositiva.\n\n" +
+    "Cuidado con las letras «de fantasía» que se copian de generadores, como 𝗲𝘀𝘁𝗮𝘀 𝗻𝗲𝗴𝗿𝗶𝘁𝗮𝘀. Muchos lectores de pantalla no las leen bien.\n\n" +
+    "Y pega el texto completo también en la publicación. El carrusel se ve como imágenes.\n\n" +
+    "¿Cuál de los tres aplicas ya?\n\n" +
+    "#UX #Accesibilidad #LinkedIn";
+  $("ejemplo").addEventListener("click", function () {
+    elTexto.value = EJEMPLO;
+    if (!elNombre.value) elNombre.value = "Ana Pérez";
+    if (!elCargo.value) elCargo.value = "UX Researcher";
+    track("carrusel-ejemplo"); render(); save();
+  });
+
+  /* ---------- PDF ---------- */
+  function latin(s) {
+    return s.replace(/[“”«»]/g, '"').replace(/[‘’]/g, "'").replace(/[–—]/g, "-").replace(/…/g, "...").replace(/→/g, "->")
+      .replace(/[^\x20-\x7E\xA0-\xFF]/g, "").replace(/\s+/g, " ").trim();
+  }
+  function slug(s) {
+    return (s || "carrusel").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50) || "carrusel";
+  }
+  btnPdf.addEventListener("click", function () {
+    if (!model) return;
+    if (!window.jspdf || !window.jspdf.jsPDF) { elEstado.textContent = "No se ha podido cargar el generador de PDF. Revisa tu conexión y vuelve a probar."; return; }
+    var o = lastOpts, total = model.slides.length;
+    elEstado.textContent = "Preparando el PDF…";
+    setTimeout(function () {
+      try {
+        var doc = new window.jspdf.jsPDF({ orientation: "p", unit: "pt", format: [W, o.H], compress: true });
+        var c = document.createElement("canvas"); c.width = W; c.height = o.H;
+        var ctx = c.getContext("2d");
+        model.slides.forEach(function (s, i) {
+          if (i) doc.addPage([W, o.H], "p");
+          var ops = [];
+          drawSlide(ctx, s, i, total, o, model.g, ops);
+          doc.addImage(c.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, W, o.H, undefined, "FAST");
+          doc.setFont("helvetica", "normal");
+          ops.forEach(function (op) { var tx = latin(op.t); if (!tx) return; doc.setFontSize(op.size); doc.text(tx, op.x, op.y, { renderingMode: "invisible" }); });
+        });
+        doc.setProperties({ title: model.title, subject: "Carrusel", author: o.name || "", creator: "Carrusel legible (" + SITE + ")" });
+        try { doc.setLanguage("es-ES"); } catch (e) {}
+        doc.save(slug(model.title) + ".pdf");
+        elEstado.textContent = "PDF descargado: " + total + " diapositivas. Súbelo en LinkedIn como documento.";
+        track("carrusel-descargar-pdf", "Descargar PDF (" + total + " diapositivas, " + o.theme + ")");
+      } catch (e) {
+        elEstado.textContent = "No se ha podido crear el PDF. Prueba con otro navegador o escríbeme y lo miro.";
+        track("carrusel-error-pdf");
+      }
+    }, 30);
+  });
+
+  btnCopiar.addEventListener("click", function () {
+    var txt = plain(elTexto.value).trim();
+    function ok() { elEstado.textContent = "Texto copiado, sin letras de fantasía. Pégalo en la publicación."; }
+    function fail() { elEstado.textContent = "No he podido copiar. Selecciona el texto del cuadro y cópialo a mano."; }
+    try { navigator.clipboard.writeText(txt).then(ok, fail); } catch (e) { fail(); }
+    track("carrusel-copiar-texto");
+  });
+
+  /* ---------- Pro ---------- */
+  document.querySelectorAll("[data-pro]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      track(b.getAttribute("data-pro"));
+      var pro = $("pro"); pro.scrollIntoView({ behavior: "smooth", block: "start" }); pro.focus({ preventScroll: true });
+    });
+  });
+  $("proBtn").addEventListener("click", function () {
+    track("carrusel-pro-me-interesa", "Carrusel Pro: me interesa");
+    $("proGracias").hidden = false; this.disabled = true;
+  });
+
+  /* ---------- Arranque: espera a las fuentes ---------- */
+  render();
+  if (document.fonts && document.fonts.load) {
+    var loads = ['800 100px "Archivo"', '400 40px "Inter Tight"', '600 40px "Inter Tight"', '500 24px "IBM Plex Mono"'].map(function (f) { return document.fonts.load(f).catch(function () {}); });
+    Promise.all(loads).then(render);
+    document.fonts.ready.then(render);
+  }
+})();
+</script>
+<script data-goatcounter="https://jrebate.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
